@@ -1,0 +1,23 @@
+{
+  "name": "MMM-HomeConnect",
+  "version": "1.0.0",
+  "description": "Magic Mirror Module for Siemens Home Connect",
+  "main": "MMM-HomeConnect.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/djerik/MMM-HomeConnect.git"
+  },
+  "keywords": [],
+  "author": "Tobias Laursen",
+  "license": "ISC",
+  "dependencies": {
+    "dbus-native": "git+https://github.com/artcom/home-connect-js"
+  }
+  "bugs": {
+    "url": "https://github.com/djerik/MMM-HomeConnect/issues"
+  },
+  "homepage": "https://github.com/djerik/MMM-HomeConnect#readme"
+}
