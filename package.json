@@ -15,7 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "home-connect-js": "git+https://github.com/artcom/home-connect-js"
-  }
+  },
   "bugs": {
     "url": "https://github.com/djerik/MMM-HomeConnect/issues"
   },
