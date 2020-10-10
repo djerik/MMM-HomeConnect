@@ -78,18 +78,4 @@ Type `git status` to see your changes, if there are any, you can reset them with
 
 
 ## Example Screen:
-![Screenshot](/Screenshots/Screenshot_001.png)
-
-![Screenshot](/Screenshots/Screenshot_002.png)
-
-![Screenshot](/Screenshots/Screenshot_003.png)
-
-![Screenshot](/Screenshots/Screenshot_004.png)
-
-![Screenshot](/Screenshots/Screenshot_005.png)
-
-![Screenshot](/Screenshots/Screenshot_006.png)
-
-![Screenshot](/Screenshots/Screenshot_007.png)
-
-![Screenshot](/Screenshots/Screenshot_008.png)
+[![Home-Connect-Hood-Screenshot.png](https://i.postimg.cc/vZgw7pn8/Home-Connect-Hood-Screenshot.png)](https://postimg.cc/rDkHMZg7)
