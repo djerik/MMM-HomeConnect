@@ -4,7 +4,7 @@ This is a module for the [MagicMirror²](https://github.com/MichMich/MagicMirror
 
 *The module is not released by the Bosch group*
 
-I used this repro for the API [home-connect-js](https://github.com/artcom/home-connect-js).
+I copies from the [Miele@Home Module](https://github.com/SAR71/MMM-MieleAtHome) used this repro for the API [home-connect-js](https://github.com/artcom/home-connect-js).
 
 The module displays your Home Connect devices on your mirror. You need to have a registred Home Connect Account with eMail and password with connected Home Connect devices. You also need to register for a Home Connect Developer Account [Home Connect Registration](https://developer.home-connect.com/user/register). You need to register an Application in the developer portal to get a Client ID and a Client Secret. These info are needed in the config of the module.
 
