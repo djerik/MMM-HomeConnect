@@ -58,12 +58,8 @@ module.exports = NodeHelper.create({
 				break;
 
 			case "UPDATEREQUEST":
-				getUpdatedHTML(this);
+				getDevices(this);
 				
-				break;
-
-			case "HTML":
-				//console.log(this.name + " HTML changed to: " + payload);
 				break;
 		}
 	},
@@ -78,7 +74,6 @@ function setConfig(config){
 function parseEvent( event, device ){
 	if( event.key == 'BSH.Common.Option.RemainingProgramTime' ){	
 		device.RemainingProgramTime = event.value;
-		console.log( device.RemainingProgramTime );
 	} else if( event.key == 'BSH.Common.Option.ProgramProgress' ){
 		device.ProgramProgress = event.value;
 	} else if( event.key == 'BSH.Common.Status.OperationState' ){
@@ -87,7 +82,6 @@ function parseEvent( event, device ){
 		}
 	} else if( event.key == 'Cooking.Common.Setting.Lighting' ){
 		device.Lighting = event.value;
-		console.log( device.Lighting );
 	} else if( event.key == 'BSH.Common.Setting.PowerState' ){
 		if( event.value == 'BSH.Common.EnumType.PowerState.On' ){
 			device.PowerState = 'On';
@@ -113,7 +107,6 @@ function deviceEvent( data, caller ){
 	eventObj.items.forEach( function( item ) {
 		if( item.uri ){
 			var haId = item.uri.split('/')[3];
-			console.log( 'haId: ' + haId );
 			parseEvent( item, devices.get( haId ) );
 		}
 	});
@@ -260,7 +253,6 @@ function generateDeviceContainerHTML(wrapper, device){
 
 		container+="</div>"
 				 +"</div>";
-
 
 		container = container.replace("${Status}", StatusString);
 

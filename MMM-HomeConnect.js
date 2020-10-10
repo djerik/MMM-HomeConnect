@@ -17,8 +17,7 @@ Module.register("MMM-HomeConnect", {
 		showDeviceIfDoorIsOpen: true, //if showAlwaysAllDevices is true, the device will be shown if Door is open
 		showDeviceIfFailure: true, //if showAlwaysAllDevices is true, the device will be shown if there is a failure
 		showDeviceIfInfoIsAvailable: true, //if showAlwaysAllDevices is true, the device will be shown if Info is Available
-		ignoreDevices: [],
-		updateFrequency: 60000
+		updateFrequency: 1000*60*60
 	},
 
 	init: function(){
