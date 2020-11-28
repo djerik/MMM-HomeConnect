@@ -1,12 +1,10 @@
 # MMM-HomeConnect
 
-This is a module for the [MagicMirror²](https://github.com/MichMich/MagicMirror/).
+This is a module for the [MagicMirror²](https://github.com/MichMich/MagicMirror/) and the module displays your Home Connect devices on your mirror.
 
 *The module is not released by the Bosch group*
 
-I copies from the [Miele@Home Module](https://github.com/SAR71/MMM-MieleAtHome) used this repro for the API [home-connect-js](https://github.com/artcom/home-connect-js).
-
-The module displays your Home Connect devices on your mirror. You need to have a registred Home Connect Account with eMail and password with connected Home Connect devices. You also need to register for a Home Connect Developer Account [Home Connect Registration](https://developer.home-connect.com/user/register). You need to register an Application in the developer portal to get a Client ID and a Client Secret. These info are needed in the config of the module.
+I copied from the [Miele@Home Module](https://github.com/SAR71/MMM-MieleAtHome) abd used this repro for the API [home-connect-js](https://github.com/artcom/home-connect-js).
 
 ## Install guide
 
@@ -17,9 +15,12 @@ cd MMM-HomeConnect
 npm install
 ```
 
-## Using the module
+- You need to have a registred Home Connect Account with eMail and password with connected Home Connect devices. 
+- You also need to register for a Home Connect Developer Account [Home Connect Registration](https://developer.home-connect.com/user/register).
+- You also need to register an Application in the developer portal to get a Client ID and a Client Secret. These info are needed in the config of the module.
+- In reg
 
-To use this module, add the following configuration block to the modules array in the `config/config.js` file:
+To install this module, add the following configuration block to the modules array in the `config/config.js` file:
 ```js
 var config = {
     modules: [
@@ -34,6 +35,9 @@ var config = {
     ]
 }
 ```
+
+
+Upon the first start of MagicMirror, it will start a browser and show the authorization screen using this URI. This is only necessary the first time, the access token will be refreshed automatically afterward.
 
 ## Configuration options
 
