@@ -4,7 +4,7 @@ This is a module for the [MagicMirror²](https://github.com/MichMich/MagicMirror
 
 *The module is not released by the Bosch group*
 
-I copied from the [Miele@Home Module](https://github.com/SAR71/MMM-MieleAtHome) abd used this repro for the API [home-connect-js](https://github.com/artcom/home-connect-js).
+I copied from the [Miele@Home Module](https://github.com/SAR71/MMM-MieleAtHome) and used this repro for the API [home-connect-js](https://github.com/artcom/home-connect-js).
 
 ## Install guide
 
