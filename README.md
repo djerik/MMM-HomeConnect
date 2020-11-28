@@ -19,6 +19,8 @@ npm install
 - You also need to register for a Home Connect Developer Account [Home Connect Registration](https://developer.home-connect.com/user/register).
 - You also need to register an Application in the developer portal to get a Client ID and a Client Secret. These info are needed in the config of the module. When registering the application, choose Authorization Code Grant Flow as OAuth Flow. And the Redirect URIs must be http://localhost:3000/o2c
 
+[HomeConnectDeveloperApplicationConfiguration.png](https://github.com/djerik/MMM-HomeConnect/blob/master/HomeConnectDeveloperApplicationConfiguration.png?raw=true)
+
 To include this module in your Magic Mirror, add the following configuration block to the modules array in the `config/config.js` file:
 ```js
 var config = {
