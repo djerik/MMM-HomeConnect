@@ -14,7 +14,7 @@
   "author": "Tobias Laursen",
   "license": "ISC",
   "dependencies": {
-    "home-connect-js": "git+https://github.com/artcom/home-connect-js"
+    "home-connect-js": "git+https://github.com/djerik/home-connect-js"
   },
   "bugs": {
     "url": "https://github.com/djerik/MMM-HomeConnect/issues"
