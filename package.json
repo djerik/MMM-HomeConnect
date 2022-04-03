@@ -1,6 +1,6 @@
 {
   "name": "MMM-HomeConnect",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Magic Mirror Module for Siemens Home Connect",
   "main": "MMM-HomeConnect.js",
   "scripts": {
