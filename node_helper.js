@@ -41,7 +41,6 @@ module.exports = NodeHelper.create({
 				 ,this.refreshToken);
 							
 				hc.on('newRefreshToken', (refresh_token) => {
-					console.log( 'received: ' + refresh_token);
 					fs.writeFileSync('./modules/MMM-HomeConnect/refresh_token.json', refresh_token );					
 					setTimeout(	getDevices, 5000, this);
 				});
@@ -118,32 +117,34 @@ function getDevices(caller){
 				.then(result => {							
 						result.body.data.homeappliances.forEach( function (device) {
 							devices.set( device.haId, device );
-							hc.subscribe( device.haId, 'NOTIFY',  function(e) {
-												deviceEvent(e,caller);											
-							});				
-							hc.subscribe( device.haId, 'STATUS',  function(e) {
-												deviceEvent(e,caller);											
-							});	
-							hc.subscribe( device.haId, 'EVENT',  function(e) {
-												deviceEvent(e,caller);											
-							});
-							hc.command('status_events', 'get_status', device.haId).then(status_result => {
-								status_result.body.data.status.forEach( 								
-									function( event ){
-										parseEvent( event, device );
-									}
-								);
-								getUpdatedHTML(caller);
-							});
-							hc.command('settings', 'get_settings', device.haId).then(settings_result => {
-								settings_result.body.data.settings.forEach( 								
-									function( event ){
-										parseEvent( event, device );
-									}
-								);
-								getUpdatedHTML(caller);
-							});
-
+							if( device.connected == true ){
+								hc.command('status_events', 'get_status', device.haId).then(status_result => {
+									status_result.body.data.status.forEach( 								
+										function( event ){
+											parseEvent( event, device );
+										}
+									);
+									getUpdatedHTML(caller);
+								});
+								
+								hc.command('settings', 'get_settings', device.haId).then(settings_result => {
+									settings_result.body.data.settings.forEach( 								
+										function( event ){
+											parseEvent( event, device );
+										}
+									);
+									getUpdatedHTML(caller);
+								});
+							}								
+						});
+						hc.subscribe( 'NOTIFY',  function(e) {
+											deviceEvent(e,caller);											
+						});				
+						hc.subscribe( 'STATUS',  function(e) {
+											deviceEvent(e,caller);											
+						});	
+						hc.subscribe( 'EVENT',  function(e) {
+											deviceEvent(e,caller);											
 						});
 						let array = [...devices.entries()];
 						sortedArray = array.sort((a, b) => (a[1].name > b[1].name) ? 1 : -1);
@@ -265,4 +266,3 @@ function generateDeviceContainerHTML(wrapper, device){
 	}
 	return wrapper;
 }
-
