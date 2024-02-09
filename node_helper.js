@@ -113,12 +113,12 @@ function deviceEvent( data, caller ){
 }
 	
 function getDevices(caller){
-		hc.command('default', 'get_home_appliances')
+		hc.command('appliances', 'get_home_appliances')
 				.then(result => {							
 						result.body.data.homeappliances.forEach( function (device) {
 							devices.set( device.haId, device );
 							if( device.connected == true ){
-								hc.command('status_events', 'get_status', device.haId).then(status_result => {
+								hc.command('status', 'get_status', device.haId).then(status_result => {
 									status_result.body.data.status.forEach( 								
 										function( event ){
 											parseEvent( event, device );
