@@ -1,7 +1,7 @@
 Module.register("MMM-HomeConnect", {
 	// define variables used by module, but not in config data
 	updated:  0,
-	HTML: "<p>Loading Module...</p>",
+	devices: [],
 
 	// holder for config info from module_name.js
 	config:null,
@@ -64,14 +64,14 @@ Module.register("MMM-HomeConnect", {
 		//]
 	},
 
-// return list of translation files to use, if any
-	/*getTranslations: function() {
+	// return list of translation files to use, if any
+	getTranslations: function() {
 		return {
-			// sample of list of files to specify here, if no files, do not use this routine, , or return empty list
-			// en: "translations/en.json",  (folders and filenames in your module folder)
-			// de: "translations/de.json"
+			en: "translations/en.json", 
+			de: "translations/de.json",
+			da: "translations/da.json",
 		}
-	}, */ 
+	}, 
 
 
 
@@ -101,16 +101,9 @@ Module.register("MMM-HomeConnect", {
 		//Log.log(this.name + " received a socket notification: " + notification + " - Payload: " + payload);
 		
 		switch(notification){
-			case "STARTUP":
-				this.HTML = payload;
-				//some_other_variable = payload;
-				this.updateDom(1000);
-			break;
-
 			case "MMM-HomeConnect_Update":
-				this.HTML = payload;
+				this.devices = payload;
 				this.updateDom();
-				//some_other_variable = payload;
 			break;
 		}
 	},
@@ -129,10 +122,112 @@ Module.register("MMM-HomeConnect", {
 
 	// this is the major worker of the module, it provides the displayable content for this module
 	getDom: function() {
-		var wrapper = document.createElement("div");
+		var div = document.createElement("div");
+		var wrapper = "";
+		_self = this;
+		
+		if( !this.devices || this.devices.length == 0 ){
+			div.innerHTML = "<span class='deviceName'><span>"+_self.translate("LOADING_APPLIANCES")+ "...</span></span>";
+			return div;
+		}
+		
+		this.devices.forEach(function (device) {
+			//Check if Device should be ignored
+			var IsSkipDevice = false;	
+			
+			if(_self.config.showAlwaysAllDevices == false && device.PowerState != 'On' && ( device.Lighting === undefined || device.Lighting != true  ) ){
 
-		wrapper.innerHTML = this.HTML;
+				IsSkipDevice = true;
 
-		return wrapper;
+				if(_self.config.showDeviceIfDoorIsOpen && device.DoorOpen){
+					IsSkipDevice = false;
+				}
+
+				if(_self.config.showDeviceIfFailure && device.Failure){
+					IsSkipDevice = false;
+				}
+						
+				if(_self.config.showDeviceIfInfoIsAvailable && device.Failure){
+					IsSkipDevice = false;
+				}
+			}
+
+			if(!IsSkipDevice){
+				var StatusString = "";
+
+				var Image = device.type + ".png";
+
+				var DeviceName = device.name;
+				
+				var container = "<div class='deviceContainerWithoutDeviceIcon'>"					
+								+ "<div>";
+
+				if(_self.config.showDeviceIcon){
+					container = "<div class='deviceContainer'>"
+								  + "<img src='/modules/MMM-HomeConnect/Icons/" + Image + "' />"
+							  + "<div>";
+				}		
+
+				if(device.PowerState == 'On' || device.PowerState == 'Standby'){
+					container += "<div>"
+								+"<img class='deviceStatusIcon' src='/modules/MMM-HomeConnect/Icons/Status/" + device.PowerState +".png' />"
+							  +"</div>";
+				}
+
+				if(device.DoorState == 'Open'){
+					container += "<div>"
+								+"<img class='deviceStatusIcon' src='/modules/MMM-HomeConnect/Icons/Status/Status_DoorOpen.png' />"
+							  +"</div>";
+				}
+
+				if(device.Lighting == true){
+					container += "<div>"
+							  +"<img class='deviceStatusIcon' src='/modules/MMM-HomeConnect/Icons/Status/Status_LightOn.png' />"
+							  +"</div>";
+				}
+				
+				container +="</div>"
+							+"<div>"
+								+"<div>"
+									+"<span class='deviceName'>" + DeviceName + "</span>"
+								+"</div>"
+								+"<div>"
+									+"<span Class='deviceStatus'>${Status}</span>"
+								+"</div>";
+
+				//Add Timebar if there is remaining Time
+				if(device.RemainingProgramTime > 0){
+					StatusString += " - "+ _self.translate("DONE_IN") + " " + new Date(device.RemainingProgramTime * 1000).toISOString().substr(11, 5);
+
+					if( device.ProgramProgress ){
+						container+="<div>"
+							+"<div Class='deviceProgress_Base'>"
+								+"<div Class='deviceProgress' style='width:" + device.ProgramProgress + "%'></div>"
+							+"</div>"
+						+"</div>";
+					}
+				}
+
+				container+="</div>"
+						 +"</div>";
+
+				container = container.replace("${Status}", StatusString);
+
+				if(wrapper == ""){
+					wrapper=container;
+				}
+				else{
+					wrapper+=container;
+				}
+			}
+		});
+							
+		//If there is no active devices then tell it
+		if(wrapper == ""){
+			wrapper = "<span class='deviceName'><span>"+ _self.translate("NO_ACTIVE_APPLIANCES") + "</span></span>";
+		}
+
+		div.innerHTML = wrapper
+		return div;
 	},
 })

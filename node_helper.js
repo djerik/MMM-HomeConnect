@@ -2,12 +2,11 @@ const HomeConnect = require('home-connect-js');
 var fs = require('fs');
 var NodeHelper = require("node_helper");
 
-var devices = new Map();
-
 module.exports = NodeHelper.create({
 		
 	refreshToken : null,
 	hc : null, 
+	devices : new Map(),
 
 	init(){
 		console.log("init module helper: MMM-HomeConnect");
@@ -40,28 +39,125 @@ module.exports = NodeHelper.create({
 				 this.config.client_Secret
 				 ,this.refreshToken);
 							
-				hc.on('newRefreshToken', (refresh_token) => {
-					fs.writeFileSync('./modules/MMM-HomeConnect/refresh_token.json', refresh_token );					
-					setTimeout(	getDevices, 5000, this);
-				});
+				var _self = this;
 								
 				hc.init({
 					isSimulated: false // whether or not to use simulated instead of physical devices (for testing)
-				});		
+				}).then(() => {
+					_self.getDevices();
+				});
 				
+				hc.on('newRefreshToken' , (refresh_token) => {
+					fs.writeFileSync('./modules/MMM-HomeConnect/refresh_token.json', refresh_token );
+					_self.getDevices();
+				});
 				
-				this.sendSocketNotification("STARTUP", "<span class='deviceName'><span>Loading appliances...</span></span>");
-
-				getUpdatedHTML(this);
-
 				break;
 
 			case "UPDATEREQUEST":
-				getDevices(this);
+				this.getDevices();
 				
 				break;
 		}
 	},
+	
+	newRefreshToken( refresh_token ){
+		fs.writeFileSync('./modules/MMM-HomeConnect/refresh_token.json', refresh_token );
+		setTimeout(this.getDevices, 5000);
+	},
+		
+	
+	getDevices(){
+		_self = this;
+		hc.command('appliances', 'get_home_appliances')
+				.then(result => {							
+						result.body.data.homeappliances.forEach( function (device) {
+							_self.devices.set( device.haId, device );
+							if( device.connected == true ){
+								hc.command('status', 'get_status', device.haId).then(status_result => {
+									status_result.body.data.status.forEach( 								
+										function( event ){
+											_self.parseEvent( event, device );
+										}
+									);
+									_self.broadcastDevices();
+								});
+								
+								hc.command('settings', 'get_settings', device.haId).then(settings_result => {
+									settings_result.body.data.settings.forEach( 								
+										function( event ){
+											_self.parseEvent( event, device );
+										}
+									);
+									_self.broadcastDevices();
+								});
+							}								
+						});
+						hc.subscribe( 'NOTIFY',  function(e) {
+											_self.deviceEvent(e);											
+						});				
+						hc.subscribe( 'STATUS',  function(e) {
+											_self.deviceEvent(e);											
+						});	
+						hc.subscribe( 'EVENT',  function(e) {
+											_self.deviceEvent(e);											
+						});
+						let array = [..._self.devices.entries()];
+						sortedArray = array.sort((a, b) => (a[1].name > b[1].name) ? 1 : -1);
+						_self.devices = new Map(sortedArray);
+						_self.broadcastDevices();
+				});
+	},
+	
+	deviceEvent( data ){
+		_self = this;
+		var eventObj = JSON.parse( data.data );	
+		eventObj.items.forEach( function( item ) {
+			if( item.uri ){
+				var haId = item.uri.split('/')[3];
+				_self.parseEvent( item, _self.devices.get( haId ) );
+			}
+		});
+		_self.broadcastDevices();
+	},
+	
+	parseEvent( event, device ){
+		if( event.key == 'BSH.Common.Option.RemainingProgramTime' ){	
+			device.RemainingProgramTime = event.value;
+		} else if( event.key == 'BSH.Common.Option.ProgramProgress' ){
+			device.ProgramProgress = event.value;
+		} else if( event.key == 'BSH.Common.Status.OperationState' ){
+			if( event.value == 'BSH.Common.EnumType.OperationState.Finished' ){
+				device.RemainingProgramTime = 0;
+			}
+		} else if( event.key == 'Cooking.Common.Setting.Lighting' ){
+			device.Lighting = event.value;
+		} else if( event.key == 'BSH.Common.Setting.PowerState' ){
+			if( event.value == 'BSH.Common.EnumType.PowerState.On' ){
+				device.PowerState = 'On';
+			} else if( event.value == 'BSH.Common.EnumType.PowerState.Standby' ){
+				device.PowerState = 'Standby';
+			} else if( event.value == 'BSH.Common.EnumType.PowerState.Off' ){
+				device.PowerState = 'Off';
+			}
+		} else if( event.key == 'BSH.Common.Status.DoorState' ){
+			if( event.value == 'BSH.Common.EnumType.DoorState.Open' ){
+				device.DoorState = 'Open';
+			} else if( event.value == 'BSH.Common.EnumType.DoorState.Closed' ){
+				device.DoorState = 'Closed';
+			} else if( event.value == 'BSH.Common.EnumType.DoorState.Locked' ){
+				device.DoorState = 'Locked';
+			}
+		}	
+	},
+	
+	
+	/**
+	 * Broadcast devices using sendSocketNotification.
+	 */
+	broadcastDevices () {
+		this.sendSocketNotification("MMM-HomeConnect_Update",  Array.from(this.devices.values()));
+	}
 });
 
 var _config;
@@ -70,7 +166,7 @@ function setConfig(config){
 	_config = config;
 }
 
-function parseEvent( event, device ){
+function parseEventBackup( event, device ){
 	if( event.key == 'BSH.Common.Option.RemainingProgramTime' ){	
 		device.RemainingProgramTime = event.value;
 	} else if( event.key == 'BSH.Common.Option.ProgramProgress' ){
@@ -101,7 +197,7 @@ function parseEvent( event, device ){
 }
 	
 
-function deviceEvent( data, caller ){
+function deviceEventBackup( data, caller ){
 	var eventObj = JSON.parse( data.data );	
 	eventObj.items.forEach( function( item ) {
 		if( item.uri ){
@@ -112,7 +208,7 @@ function deviceEvent( data, caller ){
 	getUpdatedHTML(caller);
 }
 	
-function getDevices(caller){
+function getDevicesBackup(caller){
 		hc.command('appliances', 'get_home_appliances')
 				.then(result => {							
 						result.body.data.homeappliances.forEach( function (device) {
@@ -172,7 +268,8 @@ function updateHomeConnectInfos(callback) {
 		wrapper = "<span class='deviceName'><span>No active devices</span></span>";
 	}
 
-	callback(wrapper);
+	//callback(wrapper);
+	callback(devices);
 }
 
 function generateDeviceContainerHTML(wrapper, device){
